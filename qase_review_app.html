@@ -1,0 +1,1528 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Qase Review App</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --surface-2: #eef2f5;
+      --border: #d6dde5;
+      --text: #18212f;
+      --muted: #657184;
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --green: #0f8a5f;
+      --red: #b42318;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 64px;
+      padding: 0 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 650;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+      gap: 16px;
+      padding: 16px;
+      height: calc(100vh - 64px);
+    }
+
+    section {
+      min-height: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .input-pane,
+    .review-pane {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .pane-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: #fbfcfd;
+      flex: 0 0 auto;
+    }
+
+    .pane-head h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    textarea,
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      line-height: 1.45;
+      padding: 9px 10px;
+      resize: vertical;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      outline: 2px solid rgba(37, 99, 235, 0.22);
+      border-color: var(--blue);
+    }
+
+    .requirements {
+      flex: 1;
+      min-height: 360px;
+      border: 0;
+      border-radius: 0;
+      padding: 14px;
+      resize: none;
+    }
+
+    .clickup-bar {
+      display: grid;
+      gap: 8px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .clickup-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    #clickupInput {
+      min-height: 62px;
+      resize: vertical;
+    }
+
+    .suite-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .suite-create-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .suite-parent-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .checkbox-row input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+    }
+
+    .toolbar,
+    .case-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 34px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0 12px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--surface-2);
+    }
+
+    button.primary {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+
+    button.primary:hover {
+      background: var(--blue-dark);
+    }
+
+    button.danger {
+      color: var(--red);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .status {
+      min-height: 32px;
+      padding: 9px 14px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status.ok {
+      color: var(--green);
+    }
+
+    .status.error {
+      color: var(--red);
+    }
+
+    .status.created {
+      color: var(--green);
+      font-weight: 650;
+    }
+
+    .cases {
+      flex: 1;
+      min-height: 220px;
+      overflow: auto;
+      padding: 12px;
+    }
+
+    .empty {
+      display: grid;
+      place-items: center;
+      height: 100%;
+      min-height: 260px;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .case {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .case-top {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .case-index {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .steps {
+      display: grid;
+      gap: 8px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr) minmax(0, 1fr) 42px;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .step-num {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .links {
+      display: grid;
+      gap: 4px;
+      margin: 8px 12px 12px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .created-banner {
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .duplicate-warning {
+      display: grid;
+      gap: 8px;
+      margin: 12px 12px 0;
+      padding: 10px 12px;
+      border: 1px solid #f0b429;
+      border-radius: 8px;
+      background: #fffbeb;
+      color: #7c4a03;
+      font-size: 13px;
+    }
+
+    .duplicate-warning[hidden] {
+      display: none;
+    }
+
+    .duplicate-warning strong {
+      color: #5f3700;
+    }
+
+    .duplicate-warning ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .duplicate-warning li {
+      margin: 3px 0;
+    }
+
+    .info-panel {
+      display: grid;
+      gap: 8px;
+      margin: 12px 12px 0;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fbfcfd;
+      color: var(--text);
+      font-size: 13px;
+      flex: 0 1 auto;
+      overflow: auto;
+    }
+
+    .info-panel[hidden] {
+      display: none;
+    }
+
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .panel-muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .history-item {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .history-section {
+      display: grid;
+      gap: 6px;
+    }
+
+    .history-section h4 {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .history-links,
+    .history-cases {
+      display: grid;
+      gap: 5px;
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .history-cases li {
+      padding-bottom: 5px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(24, 33, 47, 0.42);
+    }
+
+    .modal-backdrop[hidden] {
+      display: none;
+    }
+
+    .modal {
+      width: min(980px, 100%);
+      max-height: min(86vh, 820px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 18px 48px rgba(16, 24, 40, 0.18);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: #fbfcfd;
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow: auto;
+      padding: 12px;
+    }
+
+    .modal-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge.ok {
+      background: rgba(15, 138, 95, 0.12);
+      color: var(--green);
+    }
+
+    .badge.warn {
+      background: rgba(180, 35, 24, 0.1);
+      color: var(--red);
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .requirements {
+        min-height: 300px;
+      }
+
+      .fields,
+      .suite-row,
+      .suite-create-row,
+      .step {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Qase Review App</h1>
+    <div class="meta" id="configMeta">Loading...</div>
+  </header>
+  <main>
+    <section class="input-pane">
+      <div class="pane-head">
+        <h2>Requirements</h2>
+        <div class="toolbar">
+          <button id="sampleBtn" title="Insert sample">Sample</button>
+          <button id="generateBtn" class="primary" title="Generate test cases">Generate</button>
+          <button id="agentBtn" title="Load ClickUp and generate for review">Agent mode</button>
+        </div>
+      </div>
+      <div class="clickup-bar">
+        <div class="clickup-row">
+          <textarea id="clickupInput" rows="3" placeholder="ClickUp task URLs or IDs, one per line"></textarea>
+          <button id="loadClickUpBtn" title="Load ClickUp task(s)">Load</button>
+        </div>
+        <div class="suite-row">
+          <select id="suiteSelect" title="Qase suite"></select>
+          <button id="refreshSuitesBtn" title="Refresh Qase suites">Refresh</button>
+        </div>
+        <div class="suite-create-row">
+          <input id="suiteTitleInput" placeholder="New suite title" />
+          <button id="suggestSuiteBtn" title="Suggest suite from requirements">AI Suite</button>
+          <button id="createSuiteBtn" title="Create suite in Qase">Create suite</button>
+        </div>
+        <div class="suite-parent-row">
+          <select id="parentSuiteSelect" title="Parent suite for new suite"></select>
+        </div>
+        <label class="checkbox-row">
+          <input id="agentAutoSuite" type="checkbox" />
+          Agent creates suite from requirement before review
+        </label>
+        <label class="checkbox-row">
+          <input id="commentToClickUp" type="checkbox" checked />
+          Comment Qase links back to ClickUp
+        </label>
+      </div>
+      <textarea id="requirements" class="requirements" spellcheck="true"></textarea>
+      <div class="status" id="status">Ready.</div>
+    </section>
+
+    <section class="review-pane">
+      <div class="pane-head">
+        <h2>Review</h2>
+        <div class="toolbar">
+          <button id="addCaseBtn" title="Add case">Add</button>
+          <button id="checkDuplicatesBtn" title="Check duplicates without creating cases" disabled>Check duplicates</button>
+          <button id="skipDuplicatesBtn" title="Remove cases flagged as duplicates" disabled>Skip duplicate</button>
+          <button id="historyBtn" title="Show run history">Run history</button>
+          <button id="createBtn" class="primary" title="Create selected cases in Qase" disabled>Create in Qase</button>
+        </div>
+      </div>
+      <div id="duplicateWarning" class="duplicate-warning" hidden></div>
+      <div id="cases" class="cases">
+        <div class="empty">Generated cases will appear here.</div>
+      </div>
+    </section>
+  </main>
+
+  <div id="historyModal" class="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+      <div class="modal-head">
+        <h3 id="historyTitle">Run history</h3>
+        <button id="closeHistoryBtn" title="Close run history">Close</button>
+      </div>
+      <div id="runHistory" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="generateMoreModal" class="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="generateMoreTitle">
+      <div class="modal-head">
+        <h3 id="generateMoreTitle">Generate more</h3>
+        <button id="closeGenerateMoreBtn" title="Close generate more">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-form">
+          <div id="generateMoreSummary" class="panel-muted"></div>
+          <label>Additional scenarios
+            <textarea id="generateMoreInput" rows="8" placeholder="Describe only the extra scenarios you want to add."></textarea>
+          </label>
+          <div class="toolbar">
+            <button id="confirmGenerateMoreBtn" class="primary" title="Generate additional test cases">Generate more</button>
+            <button id="cancelGenerateMoreBtn" title="Cancel">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const requirementsEl = document.querySelector("#requirements");
+    const generateBtn = document.querySelector("#generateBtn");
+    const createBtn = document.querySelector("#createBtn");
+    const addCaseBtn = document.querySelector("#addCaseBtn");
+    const checkDuplicatesBtn = document.querySelector("#checkDuplicatesBtn");
+    const skipDuplicatesBtn = document.querySelector("#skipDuplicatesBtn");
+    const historyBtn = document.querySelector("#historyBtn");
+    const closeHistoryBtn = document.querySelector("#closeHistoryBtn");
+    const closeGenerateMoreBtn = document.querySelector("#closeGenerateMoreBtn");
+    const cancelGenerateMoreBtn = document.querySelector("#cancelGenerateMoreBtn");
+    const confirmGenerateMoreBtn = document.querySelector("#confirmGenerateMoreBtn");
+    const agentBtn = document.querySelector("#agentBtn");
+    const sampleBtn = document.querySelector("#sampleBtn");
+    const clickupInput = document.querySelector("#clickupInput");
+    const loadClickUpBtn = document.querySelector("#loadClickUpBtn");
+    const suiteSelect = document.querySelector("#suiteSelect");
+    const refreshSuitesBtn = document.querySelector("#refreshSuitesBtn");
+    const suiteTitleInput = document.querySelector("#suiteTitleInput");
+    const parentSuiteSelect = document.querySelector("#parentSuiteSelect");
+    const suggestSuiteBtn = document.querySelector("#suggestSuiteBtn");
+    const createSuiteBtn = document.querySelector("#createSuiteBtn");
+    const agentAutoSuite = document.querySelector("#agentAutoSuite");
+    const commentToClickUp = document.querySelector("#commentToClickUp");
+    const casesEl = document.querySelector("#cases");
+    const duplicateWarningEl = document.querySelector("#duplicateWarning");
+    const historyModal = document.querySelector("#historyModal");
+    const generateMoreModal = document.querySelector("#generateMoreModal");
+    const generateMoreInput = document.querySelector("#generateMoreInput");
+    const generateMoreSummary = document.querySelector("#generateMoreSummary");
+    const runHistoryEl = document.querySelector("#runHistory");
+    const statusEl = document.querySelector("#status");
+    const configMetaEl = document.querySelector("#configMeta");
+
+    let cases = [];
+    let currentClickUpTask = null;
+    let currentConfig = null;
+    let createdState = null;
+    let duplicateState = null;
+    let generateMoreEntry = null;
+    let suggestedSuiteDescription = "";
+    const historyKey = "qaseReviewRunHistoryV1";
+
+    const sample = `Title:
+chat_feedback_tell_us_more Mixpanel event is sent when Tell us more popup is opened
+
+Description:
+Verify that the chat_feedback_tell_us_more event is sent when the detailed feedback popup is opened.
+
+Steps:
+1. Open any chat.
+2. Click thumbs up or thumbs down.
+3. Open Mixpanel debugger.
+4. Click "Tell us more".
+
+Expected Result:
+chat_feedback_tell_us_more event is sent with correct chat_id and message_id.`;
+
+    function setStatus(message, type = "") {
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`.trim();
+    }
+
+    async function api(path, body) {
+      const response = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        const error = new Error(data.error || `Request failed: ${response.status}`);
+        error.data = data;
+        throw error;
+      }
+      return data;
+    }
+
+    async function apiGet(path) {
+      const response = await fetch(path);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || `Request failed: ${response.status}`);
+      }
+      return data;
+    }
+
+    function compactText(value, limit = 140) {
+      const text = String(value || "").replace(/\s+/g, " ").trim();
+      return text.length > limit ? `${text.slice(0, limit - 1)}...` : text;
+    }
+
+    function loadRunHistory() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(historyKey) || "[]");
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveRunHistory(entries) {
+      try {
+        localStorage.setItem(historyKey, JSON.stringify(entries.slice(0, 12)));
+      } catch {
+        // History is non-critical; Qase creation should not fail if browser storage is unavailable.
+      }
+    }
+
+    function renderRunHistory() {
+      if (!runHistoryEl) {
+        return;
+      }
+      const entries = loadRunHistory();
+      if (!entries.length) {
+        runHistoryEl.innerHTML = '<div class="empty">Run history is empty.</div>';
+        return;
+      }
+      runHistoryEl.innerHTML = `
+        <div class="panel-muted">${entries.length} saved run(s). History is stored locally in this browser.</div>
+        <ul class="history-list">
+          ${entries.map((entry, entryIndex) => `
+            <li class="history-item">
+              <div class="badge-row">
+                <span class="badge ok">${escapeHtml(entry.caseCount)} case(s)</span>
+                <span class="badge">suite ${escapeHtml(entry.suiteId)}</span>
+                <span class="badge">${escapeHtml(new Date(entry.createdAt).toLocaleString())}</span>
+                <button data-generate-more="${entryIndex}" title="Generate additional cases from this run">Generate more</button>
+              </div>
+              <div>${escapeHtml(compactText(entry.title || "Qase generation", 130))}</div>
+              <div class="history-section">
+                <h4>ClickUp tasks</h4>
+                <ul class="history-links">
+                  ${(entry.clickupTasks?.length ? entry.clickupTasks : (entry.taskIds || []).map((taskId) => ({ taskId }))).map((task) => `
+                    <li>
+                      ${task.taskUrl ? `<a href="${escapeHtml(task.taskUrl)}" target="_blank" rel="noreferrer">${escapeHtml(task.title || task.taskId || "ClickUp task")}</a>` : escapeHtml(task.title || task.taskId || "ClickUp task")}
+                      ${task.taskId ? `<span class="panel-muted"> ${escapeHtml(task.taskId)}</span>` : ""}
+                    </li>
+                  `).join("") || '<li class="panel-muted">No ClickUp task saved for this run.</li>'}
+                </ul>
+              </div>
+              <div class="history-section">
+                <h4>Test cases</h4>
+                <ol class="history-cases">
+                  ${(entry.testCases?.length ? entry.testCases : (entry.urls || []).map((url, index) => ({ title: `Qase case ${index + 1}`, url }))).map((testCase, caseIndex) => `
+                    <li>
+                      ${testCase.url ? `<a href="${escapeHtml(testCase.url)}" target="_blank" rel="noreferrer">${escapeHtml(testCase.title || `Test case ${caseIndex + 1}`)}</a>` : escapeHtml(testCase.title || `Test case ${caseIndex + 1}`)}
+                      ${testCase.description ? `<div class="panel-muted">${escapeHtml(compactText(testCase.description, 220))}</div>` : ""}
+                      ${(testCase.tags || []).length ? `<div class="badge-row">${testCase.tags.map((tag) => `<span class="badge">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
+                    </li>
+                  `).join("") || '<li class="panel-muted">No test cases saved for this run.</li>'}
+                </ol>
+              </div>
+            </li>
+          `).join("")}
+        </ul>
+      `;
+    }
+
+    function addRunHistoryEntry(entry) {
+      const entries = loadRunHistory();
+      entries.unshift({
+        createdAt: new Date().toISOString(),
+        ...entry,
+      });
+      saveRunHistory(entries);
+      if (!historyModal?.hidden) {
+        renderRunHistory();
+      }
+    }
+
+    function openRunHistory() {
+      renderRunHistory();
+      historyModal.hidden = false;
+    }
+
+    function closeRunHistory() {
+      historyModal.hidden = true;
+    }
+
+    function buildGenerateMoreRequirements(entry, additionalScenarios) {
+      const clickupTasks = entry.clickupTasks || (entry.taskIds || []).map((taskId) => ({ taskId }));
+      const existingCases = entry.testCases || (entry.urls || []).map((url, index) => ({
+        title: `Qase case ${index + 1}`,
+        url,
+      }));
+      return [
+        "Generate only additional Qase test cases.",
+        "",
+        "Context:",
+        "These ClickUp tasks were already used:",
+        ...clickupTasks.map((task, index) => [
+          `${index + 1}. ${task.title || task.taskId || "ClickUp task"}`,
+          task.taskId ? `Task ID: ${task.taskId}` : "",
+          task.taskUrl ? `URL: ${task.taskUrl}` : "",
+        ].filter(Boolean).join("\n")),
+        "",
+        "Already created test cases:",
+        ...existingCases.map((testCase, index) => [
+          `${index + 1}. ${testCase.title || `Test case ${index + 1}`}`,
+          testCase.url ? `Qase URL: ${testCase.url}` : "",
+          testCase.description ? `Description: ${testCase.description}` : "",
+          testCase.tags?.length ? `Tags: ${testCase.tags.join(", ")}` : "",
+        ].filter(Boolean).join("\n")),
+        "",
+        "Additional scenarios requested by QA:",
+        additionalScenarios,
+        "",
+        "Do not recreate, rewrite, or duplicate the already created test cases.",
+        "Create only missing test cases for the additional scenarios above.",
+        "If an additional scenario is already covered by an existing test case, do not generate it again.",
+      ].join("\n");
+    }
+
+    function openGenerateMore(entry) {
+      generateMoreEntry = entry;
+      const taskCount = entry.clickupTasks?.length || entry.taskIds?.length || 0;
+      const caseCount = entry.testCases?.length || entry.urls?.length || entry.caseCount || 0;
+      generateMoreSummary.textContent = `Using context from ${taskCount || "saved"} ClickUp task(s) and ${caseCount} already created test case(s).`;
+      generateMoreInput.value = "";
+      generateMoreModal.hidden = false;
+      generateMoreInput.focus();
+    }
+
+    function closeGenerateMore() {
+      generateMoreEntry = null;
+      generateMoreModal.hidden = true;
+    }
+
+    async function generateMoreFromHistory() {
+      if (!generateMoreEntry) {
+        throw new Error("Select a history run first.");
+      }
+      const additionalScenarios = generateMoreInput.value.trim();
+      if (!additionalScenarios) {
+        throw new Error("Add at least one additional scenario.");
+      }
+
+      const prompt = buildGenerateMoreRequirements(generateMoreEntry, additionalScenarios);
+      resetCreatedState();
+      if (generateMoreEntry.suiteId) {
+        const suiteSelected = await selectSuiteFromHistory(generateMoreEntry.suiteId);
+        if (!suiteSelected) {
+          throw new Error(`History suite ${generateMoreEntry.suiteId} is not available in the Qase suite list.`);
+        }
+      } else {
+        suiteSelect.value = "";
+      }
+      closeGenerateMore();
+      closeRunHistory();
+      requirementsEl.value = prompt;
+      currentClickUpTask = {
+        taskId: generateMoreEntry.taskIds?.[0] || generateMoreEntry.clickupTasks?.[0]?.taskId || "",
+        taskIds: generateMoreEntry.taskIds || (generateMoreEntry.clickupTasks || []).map((task) => task.taskId).filter(Boolean),
+        tasks: generateMoreEntry.clickupTasks || [],
+        title: `Additional cases for ${generateMoreEntry.title || "history run"}`,
+      };
+      setStatus("Generating additional cases from history context...");
+      const data = await api("/api/generate", { requirements: prompt });
+      cases = data.cases || [];
+      renderCases();
+      setStatus(`Generated ${cases.length} additional case(s). Review, then Check duplicates.`, "ok");
+      return cases;
+    }
+
+    function duplicateCount(state = duplicateState) {
+      if (!state) {
+        return 0;
+      }
+      return (state.generatedDuplicates || []).length + (state.existingDuplicates || []).length;
+    }
+
+    function duplicateCaseIndexes(state = duplicateState) {
+      const indexes = new Set();
+      for (const item of state?.existingDuplicates || []) {
+        indexes.add(Number(item.index));
+      }
+      for (const item of state?.generatedDuplicates || []) {
+        indexes.add(Number(item.nextIndex));
+      }
+      return indexes;
+    }
+
+    function renderDuplicateWarning() {
+      if (!duplicateWarningEl) {
+        return;
+      }
+      if (!duplicateCount()) {
+        duplicateWarningEl.hidden = true;
+        duplicateWarningEl.innerHTML = "";
+        return;
+      }
+
+      const existingItems = (duplicateState.existingDuplicates || []).slice(0, 10).map((item) => `
+        <li>
+          Case ${item.index + 1}: "${escapeHtml(item.title)}" matches
+          <a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">${escapeHtml(item.existingTitle)} (#${escapeHtml(item.existingId)})</a>
+        </li>
+      `).join("");
+      const generatedItems = (duplicateState.generatedDuplicates || []).slice(0, 10).map((item) => `
+        <li>
+          Case ${item.index + 1}: "${escapeHtml(item.title)}" is similar to case ${item.nextIndex + 1}: "${escapeHtml(item.duplicateTitle)}"
+        </li>
+      `).join("");
+      const extraCount = Math.max(0, duplicateCount() - 20);
+      const scopeText = duplicateState.checkedScope === "project" ? "Qase project" : `suite ${duplicateState.suiteId || selectedSuiteId()}`;
+      duplicateWarningEl.innerHTML = `
+        <strong>Potential duplicates found. Review before creating in Qase.</strong>
+        <div>Checked ${escapeHtml(duplicateState.checkedExistingCount || 0)} existing case(s) in ${escapeHtml(scopeText)}.</div>
+        ${existingItems ? `<ul>${existingItems}</ul>` : ""}
+        ${generatedItems ? `<ul>${generatedItems}</ul>` : ""}
+        ${extraCount ? `<div>+${extraCount} more possible duplicate(s).</div>` : ""}
+      `;
+      duplicateWarningEl.hidden = false;
+    }
+
+    function clearDuplicateState() {
+      duplicateState = null;
+      if (!createdState) {
+        createBtn.textContent = "Create in Qase";
+        createBtn.classList.add("primary");
+      }
+      renderDuplicateWarning();
+    }
+
+    function resetCreatedState() {
+      createdState = null;
+      clearDuplicateState();
+      addCaseBtn.disabled = false;
+    }
+
+    function selectedSuiteId() {
+      return Number(suiteSelect.value || 0);
+    }
+
+    function selectedParentSuiteId() {
+      return parentSuiteSelect.value ? Number(parentSuiteSelect.value) : null;
+    }
+
+    async function selectSuiteFromHistory(suiteId) {
+      const value = String(suiteId || "");
+      if (!value) {
+        suiteSelect.value = "";
+        return false;
+      }
+      if (!suiteSelect.querySelector(`option[value="${CSS.escape(value)}"]`)) {
+        await refreshSuites();
+      }
+      if (suiteSelect.querySelector(`option[value="${CSS.escape(value)}"]`)) {
+        suiteSelect.value = value;
+        clearDuplicateState();
+        return true;
+      }
+      suiteSelect.value = "";
+      return false;
+    }
+
+    function newCase() {
+      return {
+        title: "",
+        description: "",
+        preconditions: "",
+        priority: 2,
+        severity: 2,
+        steps_type: "classic",
+        steps: [{ action: "", expected_result: "", data: "" }],
+        tags: ["ai-generated"],
+      };
+    }
+
+    function renderCases() {
+      createBtn.disabled = cases.length === 0 || Boolean(createdState);
+      createBtn.textContent = createdState ? "Created" : (duplicateCount() ? "Create anyway" : "Create in Qase");
+      addCaseBtn.disabled = Boolean(createdState);
+      checkDuplicatesBtn.disabled = cases.length === 0 || Boolean(createdState);
+      skipDuplicatesBtn.disabled = !duplicateCount() || Boolean(createdState);
+      renderDuplicateWarning();
+
+      if (!cases.length) {
+        casesEl.innerHTML = '<div class="empty">Generated cases will appear here.</div>';
+        return;
+      }
+
+      const disabled = createdState ? "disabled" : "";
+      const createdLinks = createdState ? `
+        <div class="links">
+          <div class="created-banner">Created in Qase suite ${escapeHtml(createdState.suiteId)}.</div>
+          ${(createdState.urls || []).map((url) => `<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(url)}</a>`).join("")}
+        </div>
+      ` : "";
+
+      casesEl.innerHTML = createdLinks + cases.map((testCase, index) => `
+        <article class="case">
+          <div class="case-top">
+            <div class="case-index">${index + 1}</div>
+            <input value="${escapeHtml(testCase.title)}" data-case="${index}" data-field="title" placeholder="Title" ${disabled} />
+            <div class="case-actions">
+              <button title="Add step" data-add-step="${index}" ${disabled}>Step</button>
+              <button class="danger" title="Remove case" data-remove-case="${index}" ${disabled}>Remove</button>
+            </div>
+          </div>
+          <div class="fields">
+            <label class="full">Description
+              <textarea rows="3" data-case="${index}" data-field="description" ${disabled}>${escapeHtml(testCase.description)}</textarea>
+            </label>
+            <label class="full">Preconditions
+              <textarea rows="2" data-case="${index}" data-field="preconditions" ${disabled}>${escapeHtml(testCase.preconditions)}</textarea>
+            </label>
+            <label>Priority
+              <input type="number" min="1" max="3" value="${Number(testCase.priority || 2)}" data-case="${index}" data-field="priority" ${disabled} />
+            </label>
+            <label>Severity
+              <input type="number" min="1" max="3" value="${Number(testCase.severity || 2)}" data-case="${index}" data-field="severity" ${disabled} />
+            </label>
+            <label class="full">Tags
+              <input value="${escapeHtml((testCase.tags || []).join(", "))}" data-case="${index}" data-field="tags" ${disabled} />
+            </label>
+          </div>
+          <div class="steps">
+            ${(testCase.steps || []).map((step, stepIndex) => `
+              <div class="step">
+                <div class="step-num">${stepIndex + 1}</div>
+                <textarea rows="2" data-case="${index}" data-step="${stepIndex}" data-step-field="action" placeholder="Action" ${disabled}>${escapeHtml(step.action)}</textarea>
+                <textarea rows="2" data-case="${index}" data-step="${stepIndex}" data-step-field="expected_result" placeholder="Expected result" ${disabled}>${escapeHtml(step.expected_result)}</textarea>
+                <button class="danger" title="Remove step" data-remove-step="${index}:${stepIndex}" ${disabled}>X</button>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    casesEl.addEventListener("input", (event) => {
+      const target = event.target;
+      if (createdState) {
+        return;
+      }
+      if (duplicateState) {
+        clearDuplicateState();
+      }
+      const caseIndex = Number(target.dataset.case);
+
+      if (target.dataset.field) {
+        const field = target.dataset.field;
+        let value = target.value;
+        if (field === "priority" || field === "severity") {
+          value = Number(value || 2);
+        }
+        if (field === "tags") {
+          value = target.value.split(",").map((tag) => tag.trim()).filter(Boolean);
+        }
+        cases[caseIndex][field] = value;
+      }
+
+      if (target.dataset.stepField) {
+        const stepIndex = Number(target.dataset.step);
+        cases[caseIndex].steps[stepIndex][target.dataset.stepField] = target.value;
+      }
+    });
+
+    casesEl.addEventListener("click", (event) => {
+      const target = event.target;
+      if (createdState) {
+        return;
+      }
+      if (target.dataset.removeCase) {
+        clearDuplicateState();
+        cases.splice(Number(target.dataset.removeCase), 1);
+        renderCases();
+      }
+      if (target.dataset.addStep) {
+        clearDuplicateState();
+        cases[Number(target.dataset.addStep)].steps.push({ action: "", expected_result: "", data: "" });
+        renderCases();
+      }
+      if (target.dataset.removeStep) {
+        clearDuplicateState();
+        const [caseIndex, stepIndex] = target.dataset.removeStep.split(":").map(Number);
+        cases[caseIndex].steps.splice(stepIndex, 1);
+        if (!cases[caseIndex].steps.length) {
+          cases[caseIndex].steps.push({ action: "", expected_result: "", data: "" });
+        }
+        renderCases();
+      }
+    });
+
+    sampleBtn.addEventListener("click", () => {
+      resetCreatedState();
+      requirementsEl.value = sample;
+      currentClickUpTask = null;
+      cases = [];
+      renderCases();
+    });
+
+    addCaseBtn.addEventListener("click", () => {
+      resetCreatedState();
+      cases.push(newCase());
+      renderCases();
+    });
+
+    async function refreshSuites() {
+      const selected = suiteSelect.value || "";
+      const selectedParent = parentSuiteSelect.value || "";
+      suiteSelect.innerHTML = '<option value="">Loading suites...</option>';
+      parentSuiteSelect.innerHTML = '<option value="">Loading suites...</option>';
+      const data = await apiGet("/api/qase/suites");
+      const suites = data.suites || [];
+      const suiteOptions = suites.map((suite) => {
+        const prefix = suite.depth ? `${"&nbsp;".repeat(suite.depth * 3)}- ` : "";
+        return `<option value="${escapeHtml(suite.id)}">${prefix}${escapeHtml(suite.title)} (#${escapeHtml(suite.id)})</option>`;
+      }).join("");
+      suiteSelect.innerHTML = `<option value="">Select Qase suite</option>${suiteOptions}`;
+      parentSuiteSelect.innerHTML = `<option value="">Top-level suite (no parent)</option>${suiteOptions}`;
+      if (suites.some((suite) => String(suite.id) === String(selected))) {
+        suiteSelect.value = selected;
+      } else {
+        suiteSelect.value = "";
+      }
+      if (suites.some((suite) => String(suite.id) === String(selectedParent))) {
+        parentSuiteSelect.value = selectedParent;
+      } else {
+        parentSuiteSelect.value = "";
+      }
+      return suites;
+    }
+
+    async function loadClickUpTask() {
+      resetCreatedState();
+      cases = [];
+      renderCases();
+      const task = await api("/api/clickup/task", { taskInput: clickupInput.value });
+      currentClickUpTask = task;
+      requirementsEl.value = task.requirements;
+      return task;
+    }
+
+    async function generateFromRequirements() {
+      resetCreatedState();
+      const data = await api("/api/generate", { requirements: requirementsEl.value });
+      cases = data.cases || [];
+      renderCases();
+      return cases;
+    }
+
+    async function suggestSuiteTitle() {
+      const data = await api("/api/qase/suite/suggest", { requirements: requirementsEl.value });
+      suiteTitleInput.value = data.suggestion?.title || "";
+      suggestedSuiteDescription = data.suggestion?.description || "";
+      return data.suggestion;
+    }
+
+    async function createSuiteFromInput() {
+      const parentId = selectedParentSuiteId();
+      const data = await api("/api/qase/suite", {
+        title: suiteTitleInput.value,
+        description: suggestedSuiteDescription,
+        parentId,
+      });
+      const suites = await refreshSuites();
+      if (data.suite?.id) {
+        suiteSelect.value = data.suite.id;
+      } else {
+        const created = [...suites].reverse().find((suite) => suite.title === suiteTitleInput.value);
+        if (created) {
+          suiteSelect.value = created.id;
+        }
+      }
+      return data.suite;
+    }
+
+    async function checkDuplicates() {
+      if (!cases.length) {
+        throw new Error("Generate or add cases before checking duplicates.");
+      }
+      const suiteId = selectedSuiteId();
+      const duplicates = await api("/api/qase/duplicates", { cases, suiteId });
+      duplicateState = { ...duplicates, caseCount: cases.length };
+      renderCases();
+      return duplicateState;
+    }
+
+    function skipDuplicateCases() {
+      const indexes = duplicateCaseIndexes();
+      if (!indexes.size) {
+        setStatus("No duplicate cases to skip.", "ok");
+        return;
+      }
+      const beforeCount = cases.length;
+      cases = cases.filter((_, index) => !indexes.has(index));
+      clearDuplicateState();
+      renderCases();
+      setStatus(`Skipped ${beforeCount - cases.length} duplicate case(s). Review the remaining ${cases.length} case(s).`, "ok");
+    }
+
+    loadClickUpBtn.addEventListener("click", async () => {
+      try {
+        loadClickUpBtn.disabled = true;
+        setStatus("Loading ClickUp task(s)...");
+        const task = await loadClickUpTask();
+        const taskCount = task.tasks?.length || 1;
+        setStatus(`Loaded ${taskCount} ClickUp task(s): ${task.title || task.taskId}`, "ok");
+      } catch (error) {
+        setStatus(error.message, "error");
+      } finally {
+        loadClickUpBtn.disabled = false;
+      }
+    });
+
+    refreshSuitesBtn.addEventListener("click", async () => {
+      try {
+        refreshSuitesBtn.disabled = true;
+        setStatus("Loading Qase suites...");
+        await refreshSuites();
+        setStatus("Qase suites loaded.", "ok");
+      } catch (error) {
+        setStatus(error.message, "error");
+      } finally {
+        refreshSuitesBtn.disabled = false;
+      }
+    });
+
+    suiteSelect.addEventListener("change", () => {
+      clearDuplicateState();
+    });
+
+    suggestSuiteBtn.addEventListener("click", async () => {
+      try {
+        suggestSuiteBtn.disabled = true;
+        setStatus("Suggesting suite...");
+        const suggestion = await suggestSuiteTitle();
+        setStatus(`Suggested suite: ${suggestion.title}`, "ok");
+      } catch (error) {
+        setStatus(error.message, "error");
+      } finally {
+        suggestSuiteBtn.disabled = false;
+      }
+    });
+
+    createSuiteBtn.addEventListener("click", async () => {
+      try {
+        createSuiteBtn.disabled = true;
+        setStatus("Creating Qase suite...");
+        const suite = await createSuiteFromInput();
+        setStatus(`Created suite: ${suite.title}`, "ok");
+      } catch (error) {
+        setStatus(error.message, "error");
+      } finally {
+        createSuiteBtn.disabled = false;
+      }
+    });
+
+    generateBtn.addEventListener("click", async () => {
+      try {
+        generateBtn.disabled = true;
+        setStatus("Generating...");
+        await generateFromRequirements();
+        setStatus(`Generated ${cases.length} case(s).`, "ok");
+      } catch (error) {
+        setStatus(error.message, "error");
+      } finally {
+        generateBtn.disabled = false;
+      }
+    });
+
+    checkDuplicatesBtn.addEventListener("click", async () => {
+      try {
+        checkDuplicatesBtn.disabled = true;
+        setStatus("Checking Qase duplicates...");
+        const duplicates = await checkDuplicates();
+        const count = duplicateCount(duplicates);
+        if (count) {
+          setStatus(`Potential duplicates found: ${count}. Use Skip duplicate or Create anyway.`, "error");
+        } else {
+          setStatus(`No duplicates found. Checked ${duplicates.checkedExistingCount || 0} existing case(s).`, "ok");
+        }
+      } catch (error) {
+        setStatus(error.message, "error");
+      } finally {
+        checkDuplicatesBtn.disabled = cases.length === 0 || Boolean(createdState);
+      }
+    });
+
+    skipDuplicatesBtn.addEventListener("click", () => {
+      skipDuplicateCases();
+    });
+
+    historyBtn.addEventListener("click", () => {
+      openRunHistory();
+    });
+
+    closeHistoryBtn.addEventListener("click", () => {
+      closeRunHistory();
+    });
+
+    runHistoryEl.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!target.dataset.generateMore) {
+        return;
+      }
+      const entries = loadRunHistory();
+      const entry = entries[Number(target.dataset.generateMore)];
+      if (entry) {
+        openGenerateMore(entry);
+      }
+    });
+
+    historyModal.addEventListener("click", (event) => {
+      if (event.target === historyModal) {
+        closeRunHistory();
+      }
+    });
+
+    closeGenerateMoreBtn.addEventListener("click", () => {
+      closeGenerateMore();
+    });
+
+    cancelGenerateMoreBtn.addEventListener("click", () => {
+      closeGenerateMore();
+    });
+
+    generateMoreModal.addEventListener("click", (event) => {
+      if (event.target === generateMoreModal) {
+        closeGenerateMore();
+      }
+    });
+
+    confirmGenerateMoreBtn.addEventListener("click", async () => {
+      try {
+        confirmGenerateMoreBtn.disabled = true;
+        await generateMoreFromHistory();
+      } catch (error) {
+        setStatus(error.message, "error");
+      } finally {
+        confirmGenerateMoreBtn.disabled = false;
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        if (!generateMoreModal.hidden) {
+          closeGenerateMore();
+        } else if (!historyModal.hidden) {
+          closeRunHistory();
+        }
+      }
+    });
+
+    agentBtn.addEventListener("click", async () => {
+      try {
+        agentBtn.disabled = true;
+        loadClickUpBtn.disabled = true;
+        generateBtn.disabled = true;
+        setStatus("Agent: loading ClickUp task(s)...");
+        const task = await loadClickUpTask();
+
+        if (agentAutoSuite.checked) {
+          setStatus("Agent: creating suite...");
+          await suggestSuiteTitle();
+          await createSuiteFromInput();
+        }
+
+        setStatus("Agent: generating cases...");
+        await generateFromRequirements();
+        setStatus(`Agent prepared ${cases.length} case(s) from ${task.title || task.taskId}. Review, then click Create in Qase.`, "ok");
+      } catch (error) {
+        setStatus(error.message, "error");
+      } finally {
+        agentBtn.disabled = false;
+        loadClickUpBtn.disabled = false;
+        generateBtn.disabled = false;
+      }
+    });
+
+    createBtn.addEventListener("click", async () => {
+      try {
+        createBtn.disabled = true;
+        const suiteId = selectedSuiteId();
+        const canSkipDuplicateCheck = duplicateCount() && duplicateState?.suiteId === suiteId && duplicateState?.caseCount === cases.length;
+        if (!canSkipDuplicateCheck) {
+          setStatus("Checking Qase duplicates...");
+          const duplicates = await api("/api/qase/duplicates", { cases, suiteId });
+          duplicates.caseCount = cases.length;
+          duplicateState = duplicates;
+          if (duplicateCount(duplicates)) {
+            renderCases();
+            setStatus(`Potential duplicates found: ${duplicateCount(duplicates)}. Review warning, then click Create anyway if needed.`, "error");
+            return;
+          }
+          duplicateState = null;
+          renderDuplicateWarning();
+        }
+
+        setStatus("Creating in Qase...");
+        const data = await api("/api/create", {
+          cases,
+          suiteId,
+          allowDuplicates: Boolean(canSkipDuplicateCheck),
+          clickupTaskId: currentClickUpTask?.taskId || "",
+          clickupTaskIds: currentClickUpTask?.taskIds || (currentClickUpTask?.taskId ? [currentClickUpTask.taskId] : []),
+          commentToClickUp: Boolean(commentToClickUp.checked && (currentClickUpTask?.taskIds?.length || currentClickUpTask?.taskId)),
+        });
+        const urls = data.urls || [];
+        const clickUpStatus = data.clickupCommentError ? ` ClickUp comment failed: ${data.clickupCommentError}` : data.clickupComments?.length ? ` Commented ${data.clickupComments.length} ClickUp task(s).` : "";
+        duplicateState = null;
+        createdState = { urls, suiteId: data.suiteId || suiteId };
+        addRunHistoryEntry({
+          title: currentClickUpTask?.title || `${cases.length} generated case(s)`,
+          suiteId: data.suiteId || suiteId,
+          caseCount: urls.length || cases.length,
+          urls,
+          clickupTasks: (currentClickUpTask?.tasks || (currentClickUpTask?.taskId ? [currentClickUpTask] : [])).map((task) => ({
+            taskId: task.taskId || "",
+            title: task.title || task.taskId || "",
+            taskUrl: task.taskUrl || "",
+          })),
+          taskIds: currentClickUpTask?.taskIds || (currentClickUpTask?.taskId ? [currentClickUpTask.taskId] : []),
+          testCases: cases.map((testCase, index) => ({
+            title: testCase.title || `Test case ${index + 1}`,
+            description: testCase.description || "",
+            tags: testCase.tags || [],
+            url: urls[index] || "",
+          })),
+        });
+        renderCases();
+        setStatus(`Created ${urls.length || cases.length} case(s).${clickUpStatus}`, data.clickupCommentError ? "error" : "created");
+      } catch (error) {
+        if (error.data?.duplicates) {
+          duplicateState = { ...error.data.duplicates, caseCount: cases.length };
+          renderCases();
+        }
+        setStatus(error.message, "error");
+      } finally {
+        createBtn.disabled = cases.length === 0 || Boolean(createdState);
+      }
+    });
+
+    fetch("/api/config")
+      .then((response) => response.json())
+      .then((config) => {
+        currentConfig = config;
+        configMetaEl.textContent = `${config.projectCode || "Qase"} / ${config.model}`;
+        if (!config.hasOpenAiKey) {
+          setStatus("Add OPENAI_API_KEY to outputs/.env.", "error");
+        } else if (!config.hasClickUpToken) {
+          setStatus("Add CLICKUP_API_TOKEN to outputs/.env to load ClickUp tasks.", "error");
+        }
+        renderRunHistory();
+        return refreshSuites();
+      })
+      .catch(() => {
+        configMetaEl.textContent = "Config unavailable";
+      });
+  </script>
+</body>
+</html>
